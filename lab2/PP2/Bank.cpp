@@ -1,9 +1,11 @@
 #include "Bank.h"
 
-CBank::CBank()
+CBank::CBank(int csNumber)
 {
 	m_clients = std::vector<CBankClient>();
 	m_totalBalance = 0;
+	m_csNumber = csNumber;
+	InitializeCriticalSection(&criticalSection);
 }
 
 
@@ -18,6 +20,7 @@ CBankClient* CBank::CreateClient()
 
 void CBank::UpdateClientBalance(CBankClient &client, int value)
 {
+	StartCS();
 	int totalBalance = GetTotalBalance();
 	std::cout << "Client " << client.GetId() << " initiates reading total balance. Total = " << totalBalance << "." << std::endl;
 	
@@ -35,6 +38,7 @@ void CBank::UpdateClientBalance(CBankClient &client, int value)
 	}
 
 	SetTotalBalance(totalBalance);
+	LeaveCS();
 }
 
 
@@ -51,4 +55,22 @@ void CBank::SetTotalBalance(int value)
 void CBank::SomeLongOperations()
 {
 	Sleep(1000);
+}
+
+void CBank::StartCS() {
+	if (m_csNumber == 0) {
+		EnterCriticalSection(&criticalSection);
+	}
+	else if (m_csNumber == 1) {
+		mutex.lock();
+	}
+}
+
+void CBank::LeaveCS() {
+	if (m_csNumber == 0) {
+		LeaveCriticalSection(&criticalSection);
+	}
+	else if (m_csNumber == 1) {
+		mutex.unlock();
+	}
 }
