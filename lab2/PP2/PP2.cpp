@@ -43,7 +43,7 @@ int main(int argc, char *argv[])
 			}
 		}
 	}
-	CBank* bank = new CBank();
+	CBank* bank = new CBank(cs);
 	std::vector<CBankClient> clients;
 	for (int i = 0; i < count; i++) {
 		CBankClient client = *(bank->CreateClient());

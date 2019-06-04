@@ -23,12 +23,15 @@ namespace lab3.CriticalSection
         
         public void Enter()
         {
-            for(var i = 0; i < _spinCount; ++i)
+            while (true)
             {
-                // Если значением current является unlocked, изменить его на locked.
-                if (Interlocked.CompareExchange(ref _currentState, LockedState, UnlockedState) == UnlockedState)
-                { 
-                    return;
+                for(var i = 0; i < _spinCount; ++i)
+                {
+                    // Если значением current является unlocked, изменить его на locked.
+                    if (Interlocked.CompareExchange(ref _currentState, LockedState, UnlockedState) == UnlockedState)
+                    { 
+                        return;
+                    }
                 }
                 Thread.Sleep(10);
             }
@@ -49,13 +52,15 @@ namespace lab3.CriticalSection
             watch.Start();
             while (watch.ElapsedMilliseconds < timeout)
             {
-                if (Interlocked.CompareExchange(ref _currentState, LockedState, UnlockedState) == UnlockedState)
-                { 
-                    return true;
+                for(var i = 0; i < _spinCount; ++i)
+                {
+                    if (Interlocked.CompareExchange(ref _currentState, LockedState, UnlockedState) == UnlockedState)
+                    { 
+                        return true;
+                    }
                 }
                 Thread.Sleep(10);
             }
-
             return false;
         }
     }
